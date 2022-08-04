@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -10,11 +10,46 @@ import {
 } from "react-native";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import * as SplashScreen from "expo-splash-screen";
+import { initializeApp } from "firebase/app";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push,
+  set,
+  update,
+} from "firebase/database";
+
+// SplashScreen.preventAutoHideAsync();
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyDVewqG-xhKY-Jnw4RSK7cHe3gipLYoe2g",
+//   authDomain: "gamelist-c232a.firebaseapp.com",
+//   databaseURL: "https://gamelist-c232a-default-rtdb.firebaseio.com",
+//   projectId: "gamelist-c232a",
+//   storageBucket: "gamelist-c232a.appspot.com",
+//   messagingSenderId: "899831435049",
+//   appId: "1:899831435049:web:84e600787f6883c6dab138",
+// };
+// const app = initializeApp(firebaseConfig);
+// const database = getDatabase(app);
 
 export default function Main() {
   const [target, setTarget] = useState(2100);
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
+
+  // useEffect(() => {
+  //   SplashScreen.hideAsync().catch((error) => {
+  //     console.log("SS Error: ", error);
+  //   });
+  // }, []);
+
+  // const defineTarget = ()=>{
+
+  // }
+
   const addWater = () => {
     setWaterAmount(waterAmount + selectedValue);
   };
@@ -32,7 +67,9 @@ export default function Main() {
           style={styles.imageBackground}
         >
           <Text style={styles.amountText}>{waterAmount}ML</Text>
-          <Text style={styles.amountText}>{parseInt(waterAmount/target*100)}%</Text>
+          <Text style={styles.amountText}>
+            {parseInt((waterAmount / target) * 100)}%
+          </Text>
         </ImageBackground>
       </View>
       <View style={styles.inputContainer}>
