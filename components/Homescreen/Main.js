@@ -11,6 +11,8 @@ import {
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import * as SplashScreen from "expo-splash-screen";
+import { today } from "../../tools/tools";
+
 import { initializeApp } from "firebase/app";
 import {
   getDatabase,
@@ -20,8 +22,14 @@ import {
   set,
   update,
 } from "firebase/database";
-
-// SplashScreen.preventAutoHideAsync();
+import {
+  dbGetUser,
+  dbInit,
+  dropUser,
+  initTable,
+  dbAddWater,
+  dbUpdateWater,
+} from "../../tools/sqlite";
 
 // const firebaseConfig = {
 //   apiKey: "AIzaSyDVewqG-xhKY-Jnw4RSK7cHe3gipLYoe2g",
@@ -36,33 +44,100 @@ import {
 // const database = getDatabase(app);
 
 export default function Main() {
-  const [target, setTarget] = useState(2100);
+  const [target, setTarget] = useState(0);
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
+  const [monthly, setMonthly] = useState([]);
 
-  // useEffect(() => {
-  //   SplashScreen.hideAsync().catch((error) => {
-  //     console.log("SS Error: ", error);
-  //   });
-  // }, []);
+  useEffect(() => {
+    //dropUser();
+    dbInit()
+      .then((result) => {
+        dbGetUser()
+          .then((result) => {
+            const dbUser = result.rows._array;
+            console.log("dbUser: ", dbUser);
+            
+            //If database is empty (user opens the app for the 1st time) initiate the table and UI.
+            
+            if (dbUser.length == 0 ) {
+              initTable()
+                .then((result) => {
+                  console.log("Init Result: ", result);
+                  
+                })
+                .catch((error) => {
+                  console.log("Add Error: ", error);
+                });
+            }
+
+            //If a new day begins, reset the table and UI with initTable().
+            //TODO Even though date column is set to be Primary Key in the db, a new row with the same date can still be inserted with initTable()? 
+            // const newestRow = dbUser[dbUser.length - 1];
+            // console.log("The date: ", newestRow.date);
+            // if(newestRow.date != today()){
+            //   initTable()
+            //     .then((result) => {
+            //       console.log("Init Result: ", result._array);
+            //       console.log("Id: ", result.insertId);
+            //     })
+            //     .catch((error) => {
+            //       console.log("Add Error: ", error);
+            //     });
+            // }
+
+            //Load data from the newest row of database into UI.
+            // setWaterAmount(newestRow.water);
+            // setTarget(newestRow.target);
+
+
+
+            SplashScreen.hideAsync().catch((error) => {
+              console.log("SS Error: ", error);
+            });
+          })
+          .catch((error) => {
+            console.log("Get Error: ", error);
+          });
+      })
+      .catch((error) => {
+        console.log("Init Error: ", error);
+      });
+  }, []);
 
   // const defineTarget = ()=>{
 
   // }
-
+  // Update state first, and then update the database.
+  //TODO However, the waterAmount argument in dbUpdateWater is not added with the selectValue and has to be manually added?
   const addWater = () => {
     setWaterAmount(waterAmount + selectedValue);
+    // dbAddWater()
+    //   .then((r) => {
+    //     console.log("Add result: ", r);
+    //   })
+    //   .catch((error) => {
+    //     console.log("Add Error: ", error);
+    //   });
+    //console.log("current water: ", waterAmount);
+    dbUpdateWater(waterAmount + selectedValue, today())
+    .then((result)=>{
+      console.log("Update Result: ", result);
+        // setGames([...games, { title: game, id: result.insertId }]);
+    }).catch((error) => {
+      console.log("Update Error: ", error);
+    });
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.targetContainer}>
         <Text style={styles.targetText}>TODAY'S WATER TARGET</Text>
-        <Text style={styles.targetText}>2000 ML</Text>
+        <Text style={styles.targetText}>{target}ML</Text>
       </View>
       <View style={styles.amountContainer}>
         <ImageBackground
-          source={require("../assets/waterDrop.jpg")}
+          source={require("../../assets/waterDrop.jpg")}
           resizeMode="contain"
           style={styles.imageBackground}
         >

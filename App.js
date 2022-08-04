@@ -1,13 +1,27 @@
+import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Button } from "react-native";
-import HomeScreen from "./components/Home";
-import HistoryScreen from "./components/History";
-import SettingsScreen from "./components/Settings";
+import HomeScreen from "./components/Homescreen/Home";
+import HistoryScreen from "./components/Historyscreen/History";
+import SettingsScreen from "./components/Settingsscreen/Settings";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from "react-native-vector-icons/Ionicons";
+import * as SplashScreen from "expo-splash-screen";
+
+
 
 export default function App() {
+  useEffect(() => {
+    SplashScreen.preventAutoHideAsync()
+      .then((r) => {
+        console.log("Prevented? ", r);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+      });
+  }, []);
+
   const Tab = createBottomTabNavigator();
   return (
     <NavigationContainer>
@@ -24,11 +38,11 @@ export default function App() {
             let iconName;
 
             if (route.name === "Home") {
-              iconName = focused
-                ? "home"
-                : "home-outline";
+              iconName = focused ? "home" : "home-outline";
             } else if (route.name === "Settings") {
-              iconName = focused ? "ios-list-circle" : "ios-list-circle-outline";
+              iconName = focused
+                ? "ios-list-circle"
+                : "ios-list-circle-outline";
             } else if (route.name === "History") {
               iconName = focused ? "time" : "time-outline";
             }
@@ -40,7 +54,7 @@ export default function App() {
           tabBarInactiveTintColor: "white",
           tabBarStyle: {
             // position:"absolute",
-            backgroundColor:"#4287f5",
+            backgroundColor: "#4287f5",
           },
         })}
       >
