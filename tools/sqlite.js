@@ -60,6 +60,61 @@ export function dbGetUser() {
   });
 }
 
+export function dbGetMonthly() {
+  return new Promise((resolve, reject) => {
+    database.transaction(
+      (tx) => {
+        tx.executeSql(
+          `SELECT water, month FROM User
+          WHERE month=?
+          `,
+          [thisMonth()],
+          (tx, rsltSet) => {
+            resolve(rsltSet);
+          },
+          (tx, err) => {
+            reject(err);
+          }
+        );
+      },
+      (err) => {
+        reject(err);
+      },
+      () => {
+        console.log("Add Tx success.");
+      }
+    );
+  });
+}
+
+export function dbMonthGroup (){
+  return new Promise((resolve, reject) => {
+    database.transaction(
+      (tx) => {
+        tx.executeSql(
+          `SELECT month,
+            SUM(water)
+          GROUP BY month
+          `,
+          [],
+          (tx, rsltSet) => {
+            resolve(rsltSet);
+          },
+          (tx, err) => {
+            reject(err);
+          }
+        );
+      },
+      (err) => {
+        reject(err);
+      },
+      () => {
+        console.log("Add Tx success.");
+      }
+    );
+  });
+}
+
 export function initTable() {
   return new Promise((resolve, reject) => {
     database.transaction(

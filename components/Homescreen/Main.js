@@ -11,7 +11,7 @@ import {
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import * as SplashScreen from "expo-splash-screen";
-import { today } from "../../tools/tools";
+import { thisMonth, today } from "../../tools/tools";
 
 import { initializeApp } from "firebase/app";
 import {
@@ -29,6 +29,7 @@ import {
   initTable,
   dbAddWater,
   dbUpdateWater,
+  dbGetMonthly,
 } from "../../tools/sqlite";
 
 // const firebaseConfig = {
@@ -44,7 +45,7 @@ import {
 // const database = getDatabase(app);
 
 export default function Main() {
-  const [target, setTarget] = useState(0);
+  const [target, setTarget] = useState(2000);
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
   const [monthly, setMonthly] = useState([]);
@@ -53,44 +54,54 @@ export default function Main() {
     //dropUser();
     dbInit()
       .then((result) => {
+        console.log("dbInit: ", result);
+
         dbGetUser()
           .then((result) => {
             const dbUser = result.rows._array;
             console.log("dbUser: ", dbUser);
-            
+
             //If database is empty (user opens the app for the 1st time) initiate the table and UI.
-            
-            if (dbUser.length == 0 ) {
+
+            if (dbUser.length == 0) {
               initTable()
                 .then((result) => {
                   console.log("Init Result: ", result);
-                  
+
+                  // dbGetUser()
+                  //   .then((result) => {
+                  //     const dbUser = result.rows._array;
+                  //     console.log("dbUser: ", dbUser);
+                  //   })
+                  //   .catch((error) => {
+                  //     console.log("Get Error: ", error);
+                  //   });
                 })
                 .catch((error) => {
                   console.log("Add Error: ", error);
                 });
+            } else {
+              //If a new day begins, reset the table and UI with initTable().
+              //TODO Even though date column is set to be Primary Key in the db, a new row with the same date can still be inserted with initTable()?
+              const newestRow = dbUser[dbUser.length - 1];
+              console.log("The date: ", newestRow.date);
+              //Load data from the newest row of database into UI.
+              //TODO The date will not be checked unless the app is reloaded. An issue!!!
+              if(newestRow.date != today()){
+              initTable()
+                .then((result) => {
+                  console.log("Init Result: ", result._array);
+                  console.log("Id: ", result.insertId);
+                })
+                .catch((error) => {
+                  console.log("Add Error: ", error);
+                });
+            }else{
+              setWaterAmount(newestRow.water);
+              setTarget(newestRow.target);
             }
-
-            //If a new day begins, reset the table and UI with initTable().
-            //TODO Even though date column is set to be Primary Key in the db, a new row with the same date can still be inserted with initTable()? 
-            // const newestRow = dbUser[dbUser.length - 1];
-            // console.log("The date: ", newestRow.date);
-            // if(newestRow.date != today()){
-            //   initTable()
-            //     .then((result) => {
-            //       console.log("Init Result: ", result._array);
-            //       console.log("Id: ", result.insertId);
-            //     })
-            //     .catch((error) => {
-            //       console.log("Add Error: ", error);
-            //     });
-            // }
-
-            //Load data from the newest row of database into UI.
-            // setWaterAmount(newestRow.water);
-            // setTarget(newestRow.target);
-
-
+            }
+            
 
             SplashScreen.hideAsync().catch((error) => {
               console.log("SS Error: ", error);
@@ -120,13 +131,43 @@ export default function Main() {
     //     console.log("Add Error: ", error);
     //   });
     //console.log("current water: ", waterAmount);
+
     dbUpdateWater(waterAmount + selectedValue, today())
-    .then((result)=>{
-      console.log("Update Result: ", result);
+      .then((result) => {
+        console.log("Update Result: ", result);
         // setGames([...games, { title: game, id: result.insertId }]);
-    }).catch((error) => {
-      console.log("Update Error: ", error);
-    });
+      })
+      .catch((error) => {
+        console.log("Update Error: ", error);
+      });
+
+    // dbGetMonthly()
+    //   .then((r) => {
+    //     console.log("Month result: ", r.rows._array);
+    //     let monthlyTotal = 0;
+    //     let month = 0;
+    //     r.rows._array.forEach((day) => {
+    //       monthlyTotal = monthlyTotal + day.water;
+    //       month = day.month;
+    //     });
+    //     const monthlyCopy = [...monthly];
+    //     // monthlyCopy.forEach((item)=>{
+    //     //   if (item.month = month){r
+    //     //     item.monthlyTotal=monthlyTotal;
+    //     //   }
+
+    //     // })
+    //     if (monthly[monthly.length-1].month = month){
+    //       setMonthly(monthlyCopy[monthlyCopy.length-1].monthlyTotal = monthlyTotal)
+    //     } else {
+    //       setMonthly([...monthly, { monthlyTotal: monthlyTotal, month: month }]);
+    //     }
+        
+    //     console.log("Monthly update: ", monthly);
+    //   })
+    //   .catch((error) => {
+    //     console.log("Get Monthly Error: ", error);
+    //   });
   };
 
   return (
