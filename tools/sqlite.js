@@ -93,7 +93,8 @@ export function dbMonthGroup (){
       (tx) => {
         tx.executeSql(
           `SELECT month,
-            SUM(water)
+            AVG(water) as avgWater
+          FROM User
           GROUP BY month
           `,
           [],

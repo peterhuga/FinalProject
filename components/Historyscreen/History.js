@@ -8,48 +8,61 @@ import {
   ScrollView,
 } from "react-native";
 import { dbMonthGroup, dbGetMonthly, dbGetUser } from "../../tools/sqlite";
+import HistroyItem from "./HistroyItem";
 
 export default function History() {
-  console.log("History starts");
-  const [dailyRecord, setDailyRecord] = useState([]);
+  //const [dailyRecord, setDailyRecord] = useState([]);
+  const [monthlyRecord, setMonthlyRecord] = useState([]);
 
   useEffect(() => {
-    dbGetUser()
-      .then((result) => {
-        const dbUser = result.rows._array;
-        // ScrollView display recordes for up to 20 days
-        if (dbUser.length > 20) {
-          setDailyRecord(dbUser.slice(-20, 0));
-          console.log("Max 20: ", dailyRecord);
-        } else {
-          setDailyRecord(dbUser);
-          console.log("History: ", dailyRecord);
-        }
+    console.log("History starts");
+    // dbGetUser()
+    //   .then((result) => {
+    //     const dbUser = result.rows._array;
+    //     // ScrollView display recordes for up to 20 days
+    //     if (dbUser.length > 20) {
+    //       setDailyRecord(dbUser.slice(-20, 0));
+    //       console.log("Max 20: ", dailyRecord);
+    //     } else {
+    //       setDailyRecord(dbUser);
+    //       console.log("History: ", dailyRecord);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log("Get Error: ", error);
+    //   });
 
+    dbMonthGroup()
+      .then((r) => {
+        console.log("MonthGroup result: ", r.rows._array);
+        setMonthlyRecord(r.rows._array);
+        console.log("Monthly Records: ", monthlyRecord[1].month);
       })
       .catch((error) => {
-        console.log("Get Error: ", error);
+        console.log("MonthGroup Error: ", error);
       });
   }, []);
 
-  // dbGetMonthly()
-  //   .then((r) => {
-  //     console.log("MonthGroup result: ", r);
-  //   })
-  //   .catch((error) => {
-  //     console.log("MonthGroup Error: ", error);
-  //   });
-
   return (
-    <View>
-      <View>
-        <Text>MONTHLY HISTORY</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          20 DAYS HISTORY
+        </Text>
       </View>
-      <View>
-        <ScrollView>
-          <Text>July</Text>
-        </ScrollView>
-      </View>
+
+      {/* <ScrollView style={styles.list}>
+        {monthlyRecord.map((record, index) => {
+          return (
+            <View>
+              <HistroyItem>
+                month={record.month}
+                amount={record.avgWater}
+              </HistroyItem>
+            </View>
+          );
+        })}
+      </ScrollView> */}
     </View>
   );
 }
@@ -59,8 +72,21 @@ const styles = StyleSheet.create({
     flex: 1,
 
     flexDirection: "column",
-    backgroundColor: "yellow",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
+  },
+  header: {
+    flex: 1,
+    width: "100%",
+
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    borderBottomColor: "#4287f5",
+    borderBottomWidth: 3,
+  },
+  list: {
+    flex: 9,
   },
 });
