@@ -36,7 +36,7 @@ export async function getLocation() {
       granted = requestResponse.granted;
     }
     if (!granted) {
-      console.log("Location not authorizaed!");
+      //console.log("Location not authorizaed!");
       return;
     }
 
