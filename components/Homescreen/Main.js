@@ -14,14 +14,14 @@ import * as SplashScreen from "expo-splash-screen";
 import { thisMonth, today } from "../../tools/tools";
 
 import { initializeApp } from "firebase/app";
-import {
-  getDatabase,
-  ref,
-  onValue,
-  push,
-  set,
-  update,
-} from "firebase/database";
+// import {
+//   getDatabase,
+//   ref,
+//   onValue,
+//   push,
+//   set,
+//   update,
+// } from "firebase/database";
 import {
   dbGetUser,
   dbInit,
@@ -44,7 +44,8 @@ import {
 // const app = initializeApp(firebaseConfig);
 // const database = getDatabase(app);
 
-export default function Main() {
+export default function Main(props) {
+  console.log("databack to main: ", props.data);
   const [target, setTarget] = useState(2000);
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
@@ -64,7 +65,7 @@ export default function Main() {
             //If database is empty (user opens the app for the 1st time) initiate the table and UI.
 
             if (dbUser.length == 0) {
-              initTable()
+              initTable(1000)
                 .then((result) => {
                   console.log("Init Result: ", result);
 
@@ -87,21 +88,19 @@ export default function Main() {
               console.log("The date: ", newestRow.date);
               //Load data from the newest row of database into UI.
               //TODO The date will not be checked unless the app is reloaded. An issue!!!
-              if(newestRow.date != today()){
-              initTable()
-                .then((result) => {
-                  console.log("Init Result: ", result._array);
-                  console.log("Id: ", result.insertId);
-                })
-                .catch((error) => {
-                  console.log("Add Error: ", error);
-                });
-            }else{
-              setWaterAmount(newestRow.water);
-              setTarget(newestRow.target);
+              if (newestRow.date != today()) {
+                initTable(1000)
+                  .then((result) => {
+                    console.log("Init Result: ", result._array);
+                  })
+                  .catch((error) => {
+                    console.log("Add Error: ", error);
+                  });
+              } else {
+                setWaterAmount(newestRow.water);
+                setTarget(newestRow.target);
+              }
             }
-            }
-            
 
             SplashScreen.hideAsync().catch((error) => {
               console.log("SS Error: ", error);
@@ -162,7 +161,7 @@ export default function Main() {
     //     } else {
     //       setMonthly([...monthly, { monthlyTotal: monthlyTotal, month: month }]);
     //     }
-        
+
     //     console.log("Monthly update: ", monthly);
     //   })
     //   .catch((error) => {
@@ -173,7 +172,7 @@ export default function Main() {
   return (
     <View style={styles.container}>
       <View style={styles.targetContainer}>
-        <Text style={styles.targetText}>TODAY'S WATER TARGET</Text>
+        <Text style={styles.targetText}>{props.data}TODAY'S WATER TARGET</Text>
         <Text style={styles.targetText}>{target}ML</Text>
       </View>
       <View style={styles.amountContainer}>

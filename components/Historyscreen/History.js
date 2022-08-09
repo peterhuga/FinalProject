@@ -44,7 +44,7 @@ export default function () {
             <View key={index}>
               <HistoryItem
                 month={record.month}
-                amount={record.avgWater} />
+                amount={record.avgWater.toFixed(1)} />
             </View>
           );
         })}

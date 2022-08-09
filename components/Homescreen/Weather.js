@@ -7,38 +7,53 @@ import { useState, useEffect } from "react";
 const apiKey = "c8eb38d3cf154612aec35303221707";
 const baseUrl = "http://api.weatherapi.com/v1/forecast.json?";
 
-export default function Weather() {
-  console.log("Weather starts");
+export default function Weather(props) {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [temp, setTemp] = useState("");
   const [weather, setWeather] = useState("");
   const [iconImageUrl, setIconImageUrl] = useState("");
+  const [message, setMessage] = useState();
   var coords;
 
-  (async () => {
-    try {
-      coords = await getLocation();
-      console.log("Coordinates: ", coords);
-      const lat = coords.latitude;
-      const lng = coords.longitude;
-      axios
-        .get(`${baseUrl}key=${apiKey}&q=${lat},${lng}&dyas=1&aqi=no&alerts=no`)
-        .then((r) => {
-          
-          setCity(r.data.location.name);
-          setCountry(r.data.location.country);
-          setTemp(r.data.forecast.forecastday[0].day.maxtemp_c);
-          setWeather(r.data.current.condition.text);
-          setIconImageUrl(r.data.current.condition.icon);
-        })
-        .catch((e) => {
-          console.log("Error: ", e);
-        });
-    } catch (e) {
-      console.log("error: ", e);
-    }
-  })();
+  // callback to send temperature to Home component.
+  const sendData = (data) => {
+    props.parentCallback(data);
+  };
+
+  //Get coordinates from location tool to be used to query against weather API
+  useEffect(() => {
+    (async () => {
+      try {
+        coords = await getLocation();
+        //console.log("Coordinates: ", coords);
+        const lat = coords.latitude;
+        const lng = coords.longitude;
+        axios
+          .get(
+            `${baseUrl}key=${apiKey}&q=${lat},${lng}&days=1&aqi=no&alerts=no`
+          )
+          .then((r) => {
+            if (r!=null) {
+              setCity(r.data.location.name);
+              setCountry(r.data.location.country);
+              setTemp(r.data.forecast.forecastday[0].day.maxtemp_c);
+
+              setWeather(r.data.current.condition.text);
+              setIconImageUrl(r.data.current.condition.icon);
+              sendData(temp);
+            }else{
+              setCity("No weather data available.")
+            }
+          })
+          .catch((e) => {
+            console.log("Error: ", e);
+          });
+      } catch (e) {
+        console.log("error: ", e);
+      }
+    })();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -55,7 +70,7 @@ export default function Weather() {
           source={{
             uri: `http:${iconImageUrl}`,
           }}
-          style={{ width: 100, height: 100, marginTop:5 }}
+          style={{ width: 100, height: 100, marginTop: 5 }}
         />
       </View>
     </View>
