@@ -25,7 +25,7 @@ export default function Weather() {
       axios
         .get(`${baseUrl}key=${apiKey}&q=${lat},${lng}&dyas=1&aqi=no&alerts=no`)
         .then((r) => {
-          console.log(r.data);
+          
           setCity(r.data.location.name);
           setCountry(r.data.location.country);
           setTemp(r.data.forecast.forecastday[0].day.maxtemp_c);

@@ -19,20 +19,20 @@ export function thisMonth() {
 }
 
 export async function getLocation() {
-  // const handleGetLocation = async () => {
+  
   try {
     const enabled = await Location.hasServicesEnabledAsync();
     if (!enabled) {
       return;
     }
     const getResponse = await Location.getForegroundPermissionsAsync();
-    console.log("GetResponse: ", getResponse);
+    //console.log("GetResponse: ", getResponse);
 
     const granted = getResponse.granted;
     if (!granted) {
       const requestResponse =
         await Location.requestForegroundPermissionsAsync();
-      console.log("RequestResponse: ", requestResponse);
+      //console.log("RequestResponse: ", requestResponse);
       granted = requestResponse.granted;
     }
     if (!granted) {
@@ -51,5 +51,5 @@ export async function getLocation() {
   } catch (e) {
     console.log("Error: ", e);
   }
-  // };
+  
 }

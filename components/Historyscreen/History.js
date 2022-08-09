@@ -14,35 +14,21 @@ export default function () {
   //const [dailyRecord, setDailyRecord] = useState([]);
   const [monthlyRecord, setMonthlyRecord] = useState([]);
 
-  useEffect(() => {
-    console.log("History starts");
-    // dbGetUser()
-    //   .then((result) => {
-    //     const dbUser = result.rows._array;
-    //     // ScrollView display recordes for up to 20 days
-    //     if (dbUser.length > 20) {
-    //       setDailyRecord(dbUser.slice(-20, 0));
-    //       console.log("Max 20: ", dailyRecord);
-    //     } else {
-    //       setDailyRecord(dbUser);
-    //       console.log("History: ", dailyRecord);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.log("Get Error: ", error);
-    //   });
+  // useEffect(() => {
+    
+    
 
     dbMonthGroup()
       .then((r) => {
         console.log("MonthGroup result: ", r.rows._array);
         setMonthlyRecord(r.rows._array);
         console.log("Monthly Records: ", monthlyRecord[1].month);
-        // monthlyRecord.map((r)=>{console.log("object" + r.month)});
+        
       })
       .catch((error) => {
         console.log("MonthGroup Error: ", error);
       });
-  }, []);
+  // }, []);
 
   return (
     <View style={styles.container}>
