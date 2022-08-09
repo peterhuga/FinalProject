@@ -1,10 +1,13 @@
 import React from 'react';
 import {View, StyleSheet, Text, Button, Snackbar} from "react-native";
+import Profile from './Profile';
+import Notification from './Notification';
 
 export default function Settings () {
     return(
         <View style={styles.container}>
-            <Text>Settings</Text>
+            <Profile/>
+            <Notification/>
         </View>
     )
 }
@@ -13,7 +16,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       flexDirection: "column",
-      backgroundColor: "green",
+      
       alignItems: "center",
       justifyContent: "center",
     },

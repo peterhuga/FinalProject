@@ -8,9 +8,9 @@ import {
   ScrollView,
 } from "react-native";
 import { dbMonthGroup, dbGetMonthly, dbGetUser } from "../../tools/sqlite";
-import HistroyItem from "./HistroyItem";
+import HistoryItem from "./HistoryItem";
 
-export default function History() {
+export default function () {
   //const [dailyRecord, setDailyRecord] = useState([]);
   const [monthlyRecord, setMonthlyRecord] = useState([]);
 
@@ -37,6 +37,7 @@ export default function History() {
         console.log("MonthGroup result: ", r.rows._array);
         setMonthlyRecord(r.rows._array);
         console.log("Monthly Records: ", monthlyRecord[1].month);
+        // monthlyRecord.map((r)=>{console.log("object" + r.month)});
       })
       .catch((error) => {
         console.log("MonthGroup Error: ", error);
@@ -47,22 +48,22 @@ export default function History() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-          20 DAYS HISTORY
+          MONTHLY AVERAGE
         </Text>
       </View>
-
-      {/* <ScrollView style={styles.list}>
+      <View style={styles.list}>
+     <ScrollView >
         {monthlyRecord.map((record, index) => {
           return (
-            <View>
-              <HistroyItem>
+            <View key={index}>
+              <HistoryItem
                 month={record.month}
-                amount={record.avgWater}
-              </HistroyItem>
+                amount={record.avgWater} />
             </View>
           );
         })}
-      </ScrollView> */}
+      </ScrollView> 
+      </View>
     </View>
   );
 }
@@ -88,5 +89,7 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 9,
+    width:"100%",
+    
   },
 });
