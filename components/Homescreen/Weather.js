@@ -34,7 +34,7 @@ export default function Weather(props) {
             `${baseUrl}key=${apiKey}&q=${lat},${lng}&days=1&aqi=no&alerts=no`
           )
           .then((r) => {
-            if (r!=null) {
+            
               setCity(r.data.location.name);
               setCountry(r.data.location.country);
               setTemp(r.data.forecast.forecastday[0].day.maxtemp_c);
@@ -42,12 +42,11 @@ export default function Weather(props) {
               setWeather(r.data.current.condition.text);
               setIconImageUrl(r.data.current.condition.icon);
               sendData(temp);
-            }else{
-              setCity("No weather data available.")
-            }
+            
           })
           .catch((e) => {
             console.log("Error: ", e);
+            setCity("No Weather Data Available.")
           });
       } catch (e) {
         console.log("error: ", e);

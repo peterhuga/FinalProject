@@ -32,6 +32,8 @@ import {
   dbGetMonthly,
 } from "../../tools/sqlite";
 
+import * as Notifications from "expo-notifications";
+
 // const firebaseConfig = {
 //   apiKey: "AIzaSyDVewqG-xhKY-Jnw4RSK7cHe3gipLYoe2g",
 //   authDomain: "gamelist-c232a.firebaseapp.com",
@@ -50,6 +52,7 @@ export default function Main(props) {
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
   const [monthly, setMonthly] = useState([]);
+  const [targetLabel, setTargetLabel] = useState("TODAY'S WATER TARGET");
 
   useEffect(() => {
     //dropUser();
@@ -115,22 +118,34 @@ export default function Main(props) {
       });
   }, []);
 
-  // const defineTarget = ()=>{
+  useEffect(() => {
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Time for water",
+        body: "Water makes your healthy",
+      },
+      trigger: {
+        seconds: 7200,
+        repeats: true,
+      },
+    })
+      .then()
+      .catch((error) => {
+        console.log("Get Error: ", error);
+      });
 
-  // }
-  // Update state first, and then update the database.
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+  }, []);
+
   //TODO However, the waterAmount argument in dbUpdateWater is not added with the selectValue and has to be manually added?
   const addWater = () => {
     setWaterAmount(waterAmount + selectedValue);
-    // dbAddWater()
-    //   .then((r) => {
-    //     console.log("Add result: ", r);
-    //   })
-    //   .catch((error) => {
-    //     console.log("Add Error: ", error);
-    //   });
-    //console.log("current water: ", waterAmount);
-
     dbUpdateWater(waterAmount + selectedValue, today())
       .then((result) => {
         console.log("Update Result: ", result);
@@ -139,40 +154,22 @@ export default function Main(props) {
       .catch((error) => {
         console.log("Update Error: ", error);
       });
-
-    // dbGetMonthly()
-    //   .then((r) => {
-    //     console.log("Month result: ", r.rows._array);
-    //     let monthlyTotal = 0;
-    //     let month = 0;
-    //     r.rows._array.forEach((day) => {
-    //       monthlyTotal = monthlyTotal + day.water;
-    //       month = day.month;
-    //     });
-    //     const monthlyCopy = [...monthly];
-    //     // monthlyCopy.forEach((item)=>{
-    //     //   if (item.month = month){r
-    //     //     item.monthlyTotal=monthlyTotal;
-    //     //   }
-
-    //     // })
-    //     if (monthly[monthly.length-1].month = month){
-    //       setMonthly(monthlyCopy[monthlyCopy.length-1].monthlyTotal = monthlyTotal)
-    //     } else {
-    //       setMonthly([...monthly, { monthlyTotal: monthlyTotal, month: month }]);
-    //     }
-
-    //     console.log("Monthly update: ", monthly);
-    //   })
-    //   .catch((error) => {
-    //     console.log("Get Monthly Error: ", error);
-    //   });
+      //Check if the target is completed, and then do the following
+      if(waterAmount/target >=1){
+        //Cancel notification
+        Notifications.getAllScheduledNotificationsAsync().then((notifications) => {
+          notifications.forEach((notification) => {
+            Notifications.cancelScheduledNotificationAsync(notification.identifier);
+          });
+        });
+        setTargetLabel("Good Job! Target Done")
+      }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.targetContainer}>
-        <Text style={styles.targetText}>{props.data}TODAY'S WATER TARGET</Text>
+        <Text style={styles.targetText}>{targetLabel}</Text>
         <Text style={styles.targetText}>{target}ML</Text>
       </View>
       <View style={styles.amountContainer}>
