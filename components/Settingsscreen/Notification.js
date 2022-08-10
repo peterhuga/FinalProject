@@ -13,15 +13,11 @@ export default function () {
       <View style={styles.heading}>
         <Text style={styles.headingText}>Notfication</Text>
       </View>
+      
       <View style={styles.subContainer}>
-        <Text>Name</Text>
-        <Text>Gender</Text>
+        
       </View>
-      <View style={styles.subContainer}>
-        <Text>Height</Text>
-        <Text>Weight</Text>
-      </View>
-      <View style={{ width: "30%" }}>
+      <View >
         <Button title="Edit Profile" />
       </View>
     </View>
