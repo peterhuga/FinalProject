@@ -8,10 +8,9 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import * as SplashScreen from "expo-splash-screen";
-import { thisMonth, today } from "../../tools/tools";
+import { today } from "../../tools/tools";
 
 import { initializeApp } from "firebase/app";
 // import {
@@ -29,29 +28,15 @@ import {
   initTable,
   dbAddWater,
   dbUpdateWater,
-  dbGetMonthly,
 } from "../../tools/sqlite";
 
 import * as Notifications from "expo-notifications";
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDVewqG-xhKY-Jnw4RSK7cHe3gipLYoe2g",
-//   authDomain: "gamelist-c232a.firebaseapp.com",
-//   databaseURL: "https://gamelist-c232a-default-rtdb.firebaseio.com",
-//   projectId: "gamelist-c232a",
-//   storageBucket: "gamelist-c232a.appspot.com",
-//   messagingSenderId: "899831435049",
-//   appId: "1:899831435049:web:84e600787f6883c6dab138",
-// };
-// const app = initializeApp(firebaseConfig);
-// const database = getDatabase(app);
 
 export default function Main(props) {
   console.log("databack to main: ", props.data);
   const [target, setTarget] = useState(2000);
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
-  const [monthly, setMonthly] = useState([]);
   const [targetLabel, setTargetLabel] = useState("TODAY'S WATER TARGET");
 
   useEffect(() => {
@@ -64,7 +49,6 @@ export default function Main(props) {
           .then((result) => {
             const dbUser = result.rows._array;
             console.log("dbUser: ", dbUser);
-
             //If database is empty (user opens the app for the 1st time) initiate the table and UI.
 
             if (dbUser.length == 0) {
@@ -171,6 +155,7 @@ export default function Main(props) {
       <View style={styles.targetContainer}>
         <Text style={styles.targetText}>{targetLabel}</Text>
         <Text style={styles.targetText}>{target}ML</Text>
+        <Text>Databack{props.data}</Text>
       </View>
       <View style={styles.amountContainer}>
         <ImageBackground

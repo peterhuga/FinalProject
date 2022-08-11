@@ -5,9 +5,16 @@ import {
   Alert,
   StyleSheet,
   Button,
+  Switch
 } from "react-native";
 
+import { useState } from "react";
+
+
 export default function () {
+
+  const [isEnabled, setIsEnabled] = useState(false);
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   return (
     <View style={styles.container}>
       <View style={styles.heading}>
@@ -15,10 +22,17 @@ export default function () {
       </View>
       
       <View style={styles.subContainer}>
-        
+        <Text style={styles.text}>
+            You can disable the {"\n"} notification if you prefer
+        </Text>
       </View>
-      <View >
-        <Button title="Edit Profile" />
+      <View style={styles.subContainer}>
+        <Switch
+         trackColor={{ false: "#767577", true: "#81b0ff" }}
+         thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+         ios_backgroundColor="#3e3e3e"
+         onValueChange={toggleSwitch}
+         value={isEnabled}/>
       </View>
     </View>
   );
@@ -55,5 +69,10 @@ const styles = StyleSheet.create({
     flex: 1,
     // paddingHorizontal: 10,
     // margin: 5,
+  },
+  text: {
+    color: "#000",
+    fontSize: 20,
+    textAlign:"center",
   },
 });

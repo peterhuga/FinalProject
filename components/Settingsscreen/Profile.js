@@ -62,6 +62,11 @@ export default function () {
         <Text style={styles.headingText}>PROFILE</Text>
       </View>
       <View style={styles.subContainer}>
+        <Text style={styles.text}>
+            Enter your profile and get a {'\n'}personalized water target
+        </Text>
+      </View>
+      <View style={styles.subContainer}>
         <Text style={styles.text}>Name: {name}</Text>
         <Text style={styles.text}>Gender: {gender}</Text>
       </View>
@@ -150,6 +155,7 @@ const styles = StyleSheet.create({
   text: {
     color: "#000",
     fontSize: 20,
+    textAlign:"center",
   },
   viewWrapper: {
     flex: 1,

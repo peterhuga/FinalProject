@@ -11,8 +11,8 @@ export function dbInit() {
                   id INTEGER PRIMARY KEY NOT NULL,
                   name TEXT, 
                   gender TEXT,
-                  height INTEGER,
-                  weight INTEGER
+                  height TEXt,
+                  weight TEXT
                 )
                 `,
           [],
@@ -38,7 +38,7 @@ export function dbGetProfile() {
     database.transaction(
       (tx) => {
         tx.executeSql(
-          `SELECT id, name, gender, height, weight FROM User`,
+          `SELECT id, name, gender, height, weight FROM Profile`,
           [],
           (tx, rsltSet) => {
             resolve(rsltSet);
