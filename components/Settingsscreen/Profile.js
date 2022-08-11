@@ -9,25 +9,53 @@ import {
   TextInput,
 } from "react-native";
 
-import { useState } from "react";
-import * as ProfileDb from "../../tools/profiledb"
+import { useState, useEffect } from "react";
+import * as ProfileDb from "../../tools/profiledb";
 
 export default function () {
-
-
-
-
-    
   const [isModalVisible, setModalVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const toggleModalVisibility = () => {
-
+    ProfileDb.dbAddProfile(name, gender, weight, height)
+      .then((result) => {
+        console.log("Add Profile Result: ", result);
+      })
+      .catch((error) => {
+        console.log("Add profile Error: ", error);
+      });
     setModalVisible(!isModalVisible);
   };
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
+
+  useEffect(() => {
+    //dropUser();
+    ProfileDb.dbInit()
+      .then((result) => {
+        console.log("dbProfileInit: ", result);
+
+        ProfileDb.dbGetProfile()
+          .then((result) => {
+            const dbProfile = result.rows._array;
+            console.log("dbProfile: ", dbProfile);
+            const newestRow = dbProfile[dbProfile.length - 1];
+            console.log("Newest row: ", newestRow);
+            setName(newestRow.name);
+            setGender(newestRow.gender);
+            setHeight(newestRow.height);
+            setWeight(newestRow.weight);
+          })
+          .catch((error) => {
+            console.log("Get Profile Error: ", error);
+          });
+      })
+      .catch((error) => {
+        console.log("Init Error: ", error);
+      });
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.heading}>
@@ -51,7 +79,7 @@ export default function () {
         transparent
         visible={isModalVisible}
         // presentationStyle="fullscreen"
-        onDismiss={toggleModalVisibility}
+        //onDismiss={toggleModalVisibility}
       >
         <View style={styles.viewWrapper}>
           <View style={styles.modalView}>
@@ -139,7 +167,7 @@ const styles = StyleSheet.create({
     // transform: [{ translateX: -(width * 0.4) },
     //             { translateY: -90 }],
     height: 380,
-    width:"80%",
+    width: "80%",
     backgroundColor: "#fff",
     borderRadius: 7,
   },
