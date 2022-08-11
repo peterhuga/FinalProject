@@ -34,8 +34,7 @@ import * as ProfileDb from "../../tools/profiledb";
 import * as Notifications from "expo-notifications";
 
 export default function Main(props) {
-  
-  const [target, setTarget] = useState(1000);
+  const [target, setTarget] = useState(0);
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
   const [targetLabel, setTargetLabel] = useState("TODAY'S WATER TARGET");
@@ -43,107 +42,116 @@ export default function Main(props) {
   const [weightMultiplier, setWeightMultiplier] = useState(1);
 
   useEffect(() => {
-    ProfileDb.dbInit()
-      .then((result) => {
-        console.log("dbProfileInit: ", result);
-
-        ProfileDb.dbGetProfile()
+    (async () => {
+      try {
+        //dropUser();
+        await ProfileDb.dbInit()
           .then((result) => {
-            const dbProfile = result.rows._array;
-            //console.log("dbProfile: ", dbProfile);
-            const newestRow = dbProfile[dbProfile.length - 1];
-            //console.log("Newest row: ", newestRow);
-            setHeightMultiplier(newestRow.height / 160);
-            setWeightMultiplier(newestRow.weight / 50);
-            console.log("HM: ", heightMultiplier);
-            console.log("WM: ", weightMultiplier);
+            console.log("dbProfileInit: ", result);
+
+            ProfileDb.dbGetProfile()
+              .then((result) => {
+                const dbProfile = result.rows._array;
+                //console.log("dbProfile: ", dbProfile);
+                const newestRow = dbProfile[dbProfile.length - 1];
+                //console.log("Newest row: ", newestRow);
+                setHeightMultiplier(newestRow.height / 160);
+                setWeightMultiplier(newestRow.weight / 50);
+                console.log("HM: ", heightMultiplier);
+                console.log("WM: ", weightMultiplier);
+              })
+              .catch((error) => {
+                console.log("Get Profile Error: ", error);
+              });
           })
           .catch((error) => {
-            console.log("Get Profile Error: ", error);
+            console.log("Init Error: ", error);
           });
-      })
-      .catch((error) => {
-        console.log("Init Error: ", error);
-      });
-  }, []);
-  useEffect(() => {
-    //dropUser();
-    dbInit()
-      .then((result) => {
-        console.log("dbInit: ", result);
-
-        dbGetUser()
+        await dbInit()
           .then((result) => {
-            const dbUser = result.rows._array;
-            console.log("dbUser: ", dbUser);
-            //If database is empty (user opens the app for the 1st time) initiate the table and UI.
+            console.log("dbInit: ", result);
 
-            if (dbUser.length == 0) {
-              initTable(1000)
-                .then((result) => {
-                  //console.log("Init Result: ", result);
+            dbGetUser()
+              .then((result) => {
+                const dbUser = result.rows._array;
+                console.log("dbUser: ", dbUser);
+                //If database is empty (user opens the app for the 1st time) initiate the table and UI.
 
-                  dbGetUser()
+                if (dbUser.length == 0) {
+                  initTable(1000)
                     .then((result) => {
-                      const dbUser = result.rows._array;
-                      console.log("dbUser: ", dbUser);
-                      const newestRow = dbUser[dbUser.length - 1];
-                      setWaterAmount(newestRow.water);
-                      setTarget(newestRow.target);
+                      //console.log("Init Result: ", result);
+
+                      dbGetUser()
+                        .then((result) => {
+                          const dbUser = result.rows._array;
+                          console.log("dbUser: ", dbUser);
+                          const newestRow = dbUser[dbUser.length - 1];
+                          setWaterAmount(newestRow.water);
+                          setTarget(newestRow.target);
+                        })
+                        .catch((error) => {
+                          console.log("Get Error: ", error);
+                        });
                     })
                     .catch((error) => {
-                      console.log("Get Error: ", error);
+                      console.log("Add Error: ", error);
                     });
-                })
-                .catch((error) => {
-                  console.log("Add Error: ", error);
-                });
-            } else {
-              //If a new day begins, reset the table and UI with initTable().
-              //TODO Even though date column is set to be Primary Key in the db, a new row with the same date can still be inserted with initTable()?
-              const newestRow = dbUser[dbUser.length - 1];
-              //console.log("The date: ", newestRow.date);
-              //Load data from the newest row of database into UI.
-              //TODO The date will not be checked unless the app is reloaded. An issue!!!
-              if (newestRow.date != today()) {
-                initTable(1000)
-                  .then((result) => {
-                    console.log("New Date Init Result: ", result._array);
-                    dbGetUser()
+                } else {
+                  //If a new day begins, reset the table and UI with initTable().
+                  //TODO Even though date column is set to be Primary Key in the db, a new row with the same date can still be inserted with initTable()?
+                  const newestRow = dbUser[dbUser.length - 1];
+                  //console.log("The date: ", newestRow.date);
+                  //Load data from the newest row of database into UI.
+                  //TODO The date will not be checked unless the app is reloaded. An issue!!!
+                  if (newestRow.date != today()) {
+                    initTable(1000)
                       .then((result) => {
-                        const dbUser = result.rows._array;
-                        const newestRow = dbUser[dbUser.length - 1];
-                        //console.log("dbUser: ", dbUser);
-                        setWaterAmount(newestRow.water);
-                        setTarget(newestRow.target * heightMultiplier * weightMultiplier);
+                        console.log("New Date Init Result: ", result._array);
+                        dbGetUser()
+                          .then((result) => {
+                            const dbUser = result.rows._array;
+                            const newestRow = dbUser[dbUser.length - 1];
+                            //console.log("dbUser: ", dbUser);
+                            setWaterAmount(newestRow.water);
+                            setTarget(
+                              newestRow.target *
+                                heightMultiplier *
+                                weightMultiplier
+                            );
+                          })
+                          .catch((error) => {
+                            console.log("Get Error: ", error);
+                          });
                       })
                       .catch((error) => {
-                        console.log("Get Error: ", error);
+                        console.log("Add Error: ", error);
                       });
-                  })
-                  .catch((error) => {
-                    console.log("Add Error: ", error);
-                  });
-              } else {
-                setWaterAmount(newestRow.water);
-                setTarget(
-                  newestRow.target * heightMultiplier * weightMultiplier
-                );
-              }
-            }
+                  } else {
+                    setWaterAmount(newestRow.water);
+                    setTarget(
+                      newestRow.target * heightMultiplier * weightMultiplier
+                    );
+                  }
+                }
 
-            SplashScreen.hideAsync().catch((error) => {
-              console.log("SS Error: ", error);
-            });
+                SplashScreen.hideAsync().catch((error) => {
+                  console.log("SS Error: ", error);
+                });
+              })
+              .catch((error) => {
+                console.log("Get Error: ", error);
+              });
           })
           .catch((error) => {
-            console.log("Get Error: ", error);
+            console.log("Init Error: ", error);
           });
-      })
-      .catch((error) => {
-        console.log("Init Error: ", error);
-      });
-  }, []);
+      } catch (e) {
+        console.log("error: ", e);
+      }
+    })();
+  }, [heightMultiplier, weightMultiplier]);
+  
 
   useEffect(() => {
     Notifications.scheduleNotificationAsync({
@@ -201,8 +209,7 @@ export default function Main(props) {
     <View style={styles.container}>
       <View style={styles.targetContainer}>
         <Text style={styles.targetText}>{targetLabel}</Text>
-        <Text style={styles.targetText}>{target}ML</Text>
-        
+        <Text style={styles.targetText}>{parseInt(target)}ML</Text>
       </View>
       <View style={styles.amountContainer}>
         <ImageBackground
