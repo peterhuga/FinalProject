@@ -5,19 +5,24 @@ import Main from "./Main";
 import { useState } from "react";
 
 export default function Home() {
-  
-  var dataToMain = "notyet";
-  const callBack = (data) => {
-    dataToMain = data;
-    console.log("Callback: ", dataToMain);
-    setLoading(false);
-  };
 
+    // const [isLoading, setLoading] = useState(true);
+//  var dataToMain = "notyet";
+//     const callBack = (data) => {
+    
+//     dataToMain = data;
+//     console.log("Callback: ", dataToMain);
+//     setLoading(false)
+
+//   };
+//   if (isLoading) {
+//     return <Text>Loading...</Text>
+//   }
 
   return (
     <View style={styles.container}>
-      <Weather parentCallback={callBack} />
-      <Main data={dataToMain} />
+      <Weather />
+      <Main />
     </View>
   );
 }

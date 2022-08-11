@@ -34,7 +34,7 @@ import * as ProfileDb from "../../tools/profiledb";
 import * as Notifications from "expo-notifications";
 
 export default function Main(props) {
-  console.log("databack to main: ", props.data);
+  
   const [target, setTarget] = useState(1000);
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
@@ -115,7 +115,7 @@ export default function Main(props) {
                         const newestRow = dbUser[dbUser.length - 1];
                         //console.log("dbUser: ", dbUser);
                         setWaterAmount(newestRow.water);
-                        setTarget(newestRow.target);
+                        setTarget(newestRow.target * heightMultiplier * weightMultiplier);
                       })
                       .catch((error) => {
                         console.log("Get Error: ", error);
@@ -152,7 +152,7 @@ export default function Main(props) {
         body: "Water makes your healthy",
       },
       trigger: {
-        seconds: 7200,
+        seconds: 10,
         repeats: true,
       },
     })
@@ -202,7 +202,7 @@ export default function Main(props) {
       <View style={styles.targetContainer}>
         <Text style={styles.targetText}>{targetLabel}</Text>
         <Text style={styles.targetText}>{target}ML</Text>
-        <Text>Databack{props.data}</Text>
+        
       </View>
       <View style={styles.amountContainer}>
         <ImageBackground

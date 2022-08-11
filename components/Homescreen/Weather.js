@@ -15,12 +15,12 @@ export default function Weather(props) {
   const [iconImageUrl, setIconImageUrl] = useState("");
   const [message, setMessage] = useState();
   var coords;
-  const [isLoading, setLoading] = useState(true);
+  
 
   // callback to send temperature to Home component.
-  const sendData = (data) => {
-    props.parentCallback(data);
-  };
+  // const sendData = (data) => {
+  //   props.parentCallback(data);
+  // };
 
   //Get coordinates from location tool to be used to query against weather API
   useEffect(() => {
@@ -41,9 +41,9 @@ export default function Weather(props) {
 
             setWeather(r.data.current.condition.text);
             setIconImageUrl(r.data.current.condition.icon);
-            sendData(temp);
+            // sendData(temp);
 
-            setLoading(false);
+            // setLoading(false);
           })
           .catch((e) => {
             console.log("Error: ", e);
@@ -56,9 +56,7 @@ export default function Weather(props) {
   }, []);
 
   // Before data fetched from API, rendering loading message
-  if (isLoading) {
-    return <Text>Loading weather...</Text>;
-  }
+  
 
   return (
     <View style={styles.container}>

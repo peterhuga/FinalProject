@@ -15,8 +15,14 @@ import * as ProfileDb from "../../tools/profiledb";
 export default function () {
   const [isModalVisible, setModalVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
+  const [weight, setWeight] = useState(0);
+  const [height, setHeight] = useState(0);
+
   const toggleModalVisibility = () => {
-    ProfileDb.dbAddProfile(name, gender, weight, height)
+    ProfileDb.dbAddProfile(name, gender, height, weight)
       .then((result) => {
         //console.log("Add Profile Result: ", result);
       })
@@ -25,10 +31,6 @@ export default function () {
       });
     setModalVisible(!isModalVisible);
   };
-  const [name, setName] = useState("");
-  const [gender, setGender] = useState("");
-  const [weight, setWeight] = useState(0);
-  const [height, setHeight] = useState(0);
 
   useEffect(() => {
     //dropUser();
