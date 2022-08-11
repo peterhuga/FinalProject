@@ -2,20 +2,22 @@ import React from "react";
 import { View, StyleSheet, Text, Button, Snackbar } from "react-native";
 import Weather from "./Weather";
 import Main from "./Main";
+import { useState } from "react";
 
 export default function Home() {
- var dataToMain;
-    const callBack = (data) => {
-    
+  
+  var dataToMain = "notyet";
+  const callBack = (data) => {
     dataToMain = data;
     console.log("Callback: ", dataToMain);
-
+    setLoading(false);
   };
+
 
   return (
     <View style={styles.container}>
       <Weather parentCallback={callBack} />
-      <Main data = {dataToMain}/>
+      <Main data={dataToMain} />
     </View>
   );
 }

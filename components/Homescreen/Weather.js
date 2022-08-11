@@ -15,6 +15,7 @@ export default function Weather(props) {
   const [iconImageUrl, setIconImageUrl] = useState("");
   const [message, setMessage] = useState();
   var coords;
+  const [isLoading, setLoading] = useState(true);
 
   // callback to send temperature to Home component.
   const sendData = (data) => {
@@ -34,25 +35,30 @@ export default function Weather(props) {
             `${baseUrl}key=${apiKey}&q=${lat},${lng}&days=1&aqi=no&alerts=no`
           )
           .then((r) => {
-            
-              setCity(r.data.location.name);
-              setCountry(r.data.location.country);
-              setTemp(r.data.forecast.forecastday[0].day.maxtemp_c);
+            setCity(r.data.location.name);
+            setCountry(r.data.location.country);
+            setTemp(r.data.forecast.forecastday[0].day.maxtemp_c);
 
-              setWeather(r.data.current.condition.text);
-              setIconImageUrl(r.data.current.condition.icon);
-              sendData(temp);
-            
+            setWeather(r.data.current.condition.text);
+            setIconImageUrl(r.data.current.condition.icon);
+            sendData(temp);
+
+            setLoading(false);
           })
           .catch((e) => {
             console.log("Error: ", e);
-            setCity("No Weather Data Available.")
+            setCity("No Weather Data Available.");
           });
       } catch (e) {
         console.log("error: ", e);
       }
     })();
   }, []);
+
+  // Before data fetched from API, rendering loading message
+  if (isLoading) {
+    return <Text>Loading weather...</Text>;
+  }
 
   return (
     <View style={styles.container}>

@@ -11,8 +11,8 @@ export function dbInit() {
                   id INTEGER PRIMARY KEY NOT NULL,
                   name TEXT, 
                   gender TEXT,
-                  height TEXt,
-                  weight TEXT
+                  height INTEGER,
+                  weight INTEGER
                 )
                 `,
           [],
@@ -52,7 +52,7 @@ export function dbGetProfile() {
         reject(err);
       },
       () => {
-        console.log("Add Tx success.");
+        console.log("Get Tx success.");
       }
     );
   });

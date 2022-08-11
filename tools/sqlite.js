@@ -87,7 +87,7 @@ export function dbGetMonthly() {
   });
 }
 
-export function dbMonthGroup (){
+export function dbMonthGroup() {
   return new Promise((resolve, reject) => {
     database.transaction(
       (tx) => {
@@ -116,16 +116,15 @@ export function dbMonthGroup (){
   });
 }
 
-export function initTable() {
+export function initTable(target) {
   return new Promise((resolve, reject) => {
     database.transaction(
       (tx) => {
-        
         tx.executeSql(
           `INSERT INTO User (date, target, water, month)
              VALUES(?,?,?,?)
             `,
-          [today(), 2000, 0, thisMonth()],
+          [today(), target, 0, thisMonth()],
           (tx, rsltSet) => {
             resolve(rsltSet);
           },

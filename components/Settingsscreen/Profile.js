@@ -18,7 +18,7 @@ export default function () {
   const toggleModalVisibility = () => {
     ProfileDb.dbAddProfile(name, gender, weight, height)
       .then((result) => {
-        console.log("Add Profile Result: ", result);
+        //console.log("Add Profile Result: ", result);
       })
       .catch((error) => {
         console.log("Add profile Error: ", error);
@@ -27,19 +27,19 @@ export default function () {
   };
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
-  const [weight, setWeight] = useState("");
-  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState(0);
+  const [height, setHeight] = useState(0);
 
   useEffect(() => {
     //dropUser();
     ProfileDb.dbInit()
       .then((result) => {
-        console.log("dbProfileInit: ", result);
+        
 
         ProfileDb.dbGetProfile()
           .then((result) => {
             const dbProfile = result.rows._array;
-            console.log("dbProfile: ", dbProfile);
+            //console.log("dbProfile: ", dbProfile);
             const newestRow = dbProfile[dbProfile.length - 1];
             console.log("Newest row: ", newestRow);
             setName(newestRow.name);
@@ -102,13 +102,13 @@ export default function () {
             />
             <TextInput
               placeholder="KG"
-              value={weight}
+              value={weight.toString()}
               style={styles.textInput}
               onChangeText={(value) => setWeight(value)}
             />
             <TextInput
               placeholder="cm"
-              value={height}
+              value={height.toString()}
               style={styles.textInput}
               onChangeText={(value) => setHeight(value)}
             />

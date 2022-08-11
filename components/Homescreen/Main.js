@@ -29,16 +29,43 @@ import {
   dbAddWater,
   dbUpdateWater,
 } from "../../tools/sqlite";
+import * as ProfileDb from "../../tools/profiledb";
 
 import * as Notifications from "expo-notifications";
 
 export default function Main(props) {
   console.log("databack to main: ", props.data);
-  const [target, setTarget] = useState(2000);
+  const [target, setTarget] = useState(1000);
   const [waterAmount, setWaterAmount] = useState(0);
   const [selectedValue, setSelectedValue] = useState(100);
   const [targetLabel, setTargetLabel] = useState("TODAY'S WATER TARGET");
+  const [heightMultiplier, setHeightMultiplier] = useState(1);
+  const [weightMultiplier, setWeightMultiplier] = useState(1);
 
+  useEffect(() => {
+    ProfileDb.dbInit()
+      .then((result) => {
+        console.log("dbProfileInit: ", result);
+
+        ProfileDb.dbGetProfile()
+          .then((result) => {
+            const dbProfile = result.rows._array;
+            //console.log("dbProfile: ", dbProfile);
+            const newestRow = dbProfile[dbProfile.length - 1];
+            //console.log("Newest row: ", newestRow);
+            setHeightMultiplier(newestRow.height / 160);
+            setWeightMultiplier(newestRow.weight / 50);
+            console.log("HM: ", heightMultiplier);
+            console.log("WM: ", weightMultiplier);
+          })
+          .catch((error) => {
+            console.log("Get Profile Error: ", error);
+          });
+      })
+      .catch((error) => {
+        console.log("Init Error: ", error);
+      });
+  }, []);
   useEffect(() => {
     //dropUser();
     dbInit()
@@ -54,16 +81,19 @@ export default function Main(props) {
             if (dbUser.length == 0) {
               initTable(1000)
                 .then((result) => {
-                  console.log("Init Result: ", result);
+                  //console.log("Init Result: ", result);
 
-                  // dbGetUser()
-                  //   .then((result) => {
-                  //     const dbUser = result.rows._array;
-                  //     console.log("dbUser: ", dbUser);
-                  //   })
-                  //   .catch((error) => {
-                  //     console.log("Get Error: ", error);
-                  //   });
+                  dbGetUser()
+                    .then((result) => {
+                      const dbUser = result.rows._array;
+                      console.log("dbUser: ", dbUser);
+                      const newestRow = dbUser[dbUser.length - 1];
+                      setWaterAmount(newestRow.water);
+                      setTarget(newestRow.target);
+                    })
+                    .catch((error) => {
+                      console.log("Get Error: ", error);
+                    });
                 })
                 .catch((error) => {
                   console.log("Add Error: ", error);
@@ -72,20 +102,33 @@ export default function Main(props) {
               //If a new day begins, reset the table and UI with initTable().
               //TODO Even though date column is set to be Primary Key in the db, a new row with the same date can still be inserted with initTable()?
               const newestRow = dbUser[dbUser.length - 1];
-              console.log("The date: ", newestRow.date);
+              //console.log("The date: ", newestRow.date);
               //Load data from the newest row of database into UI.
               //TODO The date will not be checked unless the app is reloaded. An issue!!!
               if (newestRow.date != today()) {
                 initTable(1000)
                   .then((result) => {
-                    console.log("Init Result: ", result._array);
+                    console.log("New Date Init Result: ", result._array);
+                    dbGetUser()
+                      .then((result) => {
+                        const dbUser = result.rows._array;
+                        const newestRow = dbUser[dbUser.length - 1];
+                        //console.log("dbUser: ", dbUser);
+                        setWaterAmount(newestRow.water);
+                        setTarget(newestRow.target);
+                      })
+                      .catch((error) => {
+                        console.log("Get Error: ", error);
+                      });
                   })
                   .catch((error) => {
                     console.log("Add Error: ", error);
                   });
               } else {
                 setWaterAmount(newestRow.water);
-                setTarget(newestRow.target);
+                setTarget(
+                  newestRow.target * heightMultiplier * weightMultiplier
+                );
               }
             }
 
@@ -138,16 +181,20 @@ export default function Main(props) {
       .catch((error) => {
         console.log("Update Error: ", error);
       });
-      //Check if the target is completed, and then do the following
-      if(waterAmount/target >=1){
-        //Cancel notification
-        Notifications.getAllScheduledNotificationsAsync().then((notifications) => {
+    //Check if the target is completed, and then do the following
+    if (waterAmount / target >= 1) {
+      //Cancel notification
+      Notifications.getAllScheduledNotificationsAsync().then(
+        (notifications) => {
           notifications.forEach((notification) => {
-            Notifications.cancelScheduledNotificationAsync(notification.identifier);
+            Notifications.cancelScheduledNotificationAsync(
+              notification.identifier
+            );
           });
-        });
-        setTargetLabel("Good Job! Target Done")
-      }
+        }
+      );
+      setTargetLabel("Good Job! Target Done");
+    }
   };
 
   return (
