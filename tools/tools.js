@@ -28,7 +28,7 @@ export async function getLocation() {
     const getResponse = await Location.getForegroundPermissionsAsync();
     //console.log("GetResponse: ", getResponse);
 
-    const granted = getResponse.granted;
+    let granted = getResponse.granted;
     if (!granted) {
       const requestResponse =
         await Location.requestForegroundPermissionsAsync();

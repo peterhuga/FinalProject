@@ -13,16 +13,14 @@ import * as Notifications from "expo-notifications";
 
 export default function () {
   const [isEnabled, setIsEnabled] = useState(true);
-  console.log("Notification: ", isEnabled);
+
   const toggleNotification = () => {
-    console.log("Notification2: ", isEnabled);
     if (isEnabled) {
       Notifications.getAllScheduledNotificationsAsync().then(
         (notifications) => {
           notifications.forEach((notification) => {
             Notifications.cancelScheduledNotificationAsync(
               notification.identifier
-              
             );
           });
         }

@@ -8,19 +8,22 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import * as SplashScreen from "expo-splash-screen";
+import * as Notifications from 'expo-notifications';
 
 
 
 export default function App() {
-  // useEffect(() => {
-  //   SplashScreen.preventAutoHideAsync()
-  //     .then((r) => {
-  //       console.log("Prevented? ", r);
-  //     })
-  //     .catch((e) => {
-  //       console.log("Error: ", e);
-  //     });
-  // }, []);
+  useEffect(() => {
+    SplashScreen.preventAutoHideAsync()
+      .then((r) => {
+        console.log("Prevented? ", r);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+      });
+  }, []);
+
+  
 
   const Tab = createBottomTabNavigator();
   return (
