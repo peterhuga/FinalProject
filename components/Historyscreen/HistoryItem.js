@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { View, Text, StyleSheet } from "react-native";
+
 
 export default function (props) {
   return (
