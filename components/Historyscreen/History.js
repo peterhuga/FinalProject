@@ -24,9 +24,9 @@ export default function () {
         console.log("MonthGroup Error: ", error);
       });
   };
-  useEffect(() => {
+   useEffect(() => {
     handleRefresh();
-  }, []);
+   }, []);
 
   return (
     <View style={styles.container}>
