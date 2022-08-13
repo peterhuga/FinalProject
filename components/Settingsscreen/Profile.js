@@ -20,8 +20,8 @@ export default function () {
 
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
-  const [weight, setWeight] = useState(0);
-  const [height, setHeight] = useState(0);
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
 
   const toggleModalVisibility = () => {
     setModalVisible(!isModalVisible);
@@ -49,7 +49,7 @@ export default function () {
         ProfileDb.dbGetProfile()
           .then((result) => {
             const dbProfile = result.rows._array;
-            //console.log("dbProfile: ", dbProfile);
+            
             const newestRow = dbProfile[dbProfile.length - 1];
             console.log("Newest row: ", newestRow);
             setName(newestRow.name);
@@ -94,7 +94,7 @@ export default function () {
         animationType="slide"
         transparent
         visible={isModalVisible}
-        
+        onRequestClose={toggleModalVisibility}
         //onDismiss={toggleModalVisibility}
       >
         

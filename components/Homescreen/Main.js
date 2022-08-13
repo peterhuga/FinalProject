@@ -3,30 +3,19 @@ import {
   View,
   StyleSheet,
   Text,
-  Button,
-  Snackbar,
   ImageBackground,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import * as SplashScreen from "expo-splash-screen";
 import { today } from "../../tools/tools";
 
-import { initializeApp } from "firebase/app";
-// import {
-//   getDatabase,
-//   ref,
-//   onValue,
-//   push,
-//   set,
-//   update,
-// } from "firebase/database";
 import {
   dbGetUser,
   dbInit,
   dropUser,
   initTable,
-  dbAddWater,
   dbUpdateWater,
 } from "../../tools/sqlite";
 import * as ProfileDb from "../../tools/profiledb";
@@ -99,11 +88,11 @@ export default function Main(props) {
                     });
                 } else {
                   //If a new day begins, reset the table and UI with initTable().
-                  //TODO Even though date column is set to be Primary Key in the db, a new row with the same date can still be inserted with initTable()?
+
                   const newestRow = dbUser[dbUser.length - 1];
                   //console.log("The date: ", newestRow.date);
                   //Load data from the newest row of database into UI.
-                  //TODO The date will not be checked unless the app is reloaded. An issue!!!
+
                   if (newestRow.date != today()) {
                     initTable(1000)
                       .then((result) => {
@@ -114,11 +103,21 @@ export default function Main(props) {
                             const newestRow = dbUser[dbUser.length - 1];
                             //console.log("dbUser: ", dbUser);
                             setWaterAmount(newestRow.water);
-                            setTarget(
-                              newestRow.target *
-                                heightMultiplier *
-                                weightMultiplier
-                            );
+
+                            //If user did not enter profile, use default target of 1000ml
+
+                            if (
+                              heightMultiplier == 0 ||
+                              weightMultiplier == 0
+                            ) {
+                              setTarget(newestRow.target);
+                            } else {
+                              setTarget(
+                                newestRow.target *
+                                  heightMultiplier *
+                                  weightMultiplier
+                              );
+                            }
                           })
                           .catch((error) => {
                             console.log("Get Error: ", error);
@@ -129,9 +128,13 @@ export default function Main(props) {
                       });
                   } else {
                     setWaterAmount(newestRow.water);
-                    setTarget(
-                      newestRow.target * heightMultiplier * weightMultiplier
-                    );
+                    if (heightMultiplier == 0 || weightMultiplier == 0) {
+                      setTarget(newestRow.target);
+                    } else {
+                      setTarget(
+                        newestRow.target * heightMultiplier * weightMultiplier
+                      );
+                    }
                   }
                 }
 
@@ -151,7 +154,6 @@ export default function Main(props) {
       }
     })();
   }, [heightMultiplier, weightMultiplier]);
-  
 
   useEffect(() => {
     Notifications.scheduleNotificationAsync({
@@ -178,31 +180,43 @@ export default function Main(props) {
     });
   }, []);
 
-  //TODO However, the waterAmount argument in dbUpdateWater is not added with the selectValue and has to be manually added?
   const addWater = () => {
-    setWaterAmount(waterAmount + selectedValue);
-    dbUpdateWater(waterAmount + selectedValue, today())
-      .then((result) => {
-        console.log("Update Result: ", result);
-        // setGames([...games, { title: game, id: result.insertId }]);
-      })
-      .catch((error) => {
-        console.log("Update Error: ", error);
-      });
-    //Check if the target is completed, and then do the following
-    if (waterAmount / target >= 1) {
-      //Cancel notification
-      Notifications.getAllScheduledNotificationsAsync().then(
-        (notifications) => {
-          notifications.forEach((notification) => {
-            Notifications.cancelScheduledNotificationAsync(
-              notification.identifier
+    Alert.alert("You drank some water", "Is the volume correct?", [
+      {
+        text: "Cancel",
+        onPress: () => {
+          console.log("Cancel pressed");
+        },
+        style: "cancel",
+      },
+      {
+        text: "Confirm",
+        onPress: () => {
+          setWaterAmount(waterAmount + selectedValue);
+          dbUpdateWater(waterAmount + selectedValue, today())
+            .then((result) => {
+              console.log("Update Result: ", result);
+            })
+            .catch((error) => {
+              console.log("Update Error: ", error);
+            });
+          //Check if the target is completed, and then do the following
+          if (waterAmount / target >= 1) {
+            //Cancel notification
+            Notifications.getAllScheduledNotificationsAsync().then(
+              (notifications) => {
+                notifications.forEach((notification) => {
+                  Notifications.cancelScheduledNotificationAsync(
+                    notification.identifier
+                  );
+                });
+              }
             );
-          });
-        }
-      );
-      setTargetLabel("Good Job! Target Done");
-    }
+            setTargetLabel("Good Job! Target Done");
+          }
+        },
+      },
+    ]);
   };
 
   return (
