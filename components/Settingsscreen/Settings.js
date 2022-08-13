@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Text, Button, Snackbar} from "react-native";
+import {View, StyleSheet} from "react-native";
 import Profile from './Profile';
 import Notification from './Notification';
 

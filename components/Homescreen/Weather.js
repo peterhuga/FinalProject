@@ -73,7 +73,7 @@ export default function Weather(props) {
           source={{
             uri: `http:${iconImageUrl}`,
           }}
-          style={{ width: 100, height: 100, marginTop: 5 }}
+          style={{ width: 100, height: 100, marginTop: 15 }}
         />
       </View>
     </View>

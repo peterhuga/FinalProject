@@ -11,17 +11,27 @@ import {
 
 import { useState, useEffect } from "react";
 import * as ProfileDb from "../../tools/profiledb";
+import ProfileInput from "./ProfileInput";
 
 export default function () {
   const [isModalVisible, setModalVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
   
+
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [weight, setWeight] = useState(0);
   const [height, setHeight] = useState(0);
 
   const toggleModalVisibility = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const addProfile = (name, gender, height, weight) => {
+    setName(name)
+    setGender(gender)
+    setHeight(height)
+    setWeight(weight)
     ProfileDb.dbAddProfile(name, gender, height, weight)
       .then((result) => {
         //console.log("Add Profile Result: ", result);
@@ -36,8 +46,6 @@ export default function () {
     //dropUser();
     ProfileDb.dbInit()
       .then((result) => {
-        
-
         ProfileDb.dbGetProfile()
           .then((result) => {
             const dbProfile = result.rows._array;
@@ -65,7 +73,7 @@ export default function () {
       </View>
       <View style={styles.subContainer}>
         <Text style={styles.text}>
-            Enter your profile and get a {'\n'}personalized water target
+          Enter your profile and get a {"\n"}personalized water target
         </Text>
       </View>
       <View style={styles.subContainer}>
@@ -81,43 +89,18 @@ export default function () {
         color="#4287f5"
         onPress={toggleModalVisibility}
       />
+      
       <Modal
         animationType="slide"
         transparent
         visible={isModalVisible}
-        // presentationStyle="fullscreen"
+        
         //onDismiss={toggleModalVisibility}
       >
-        <View style={styles.viewWrapper}>
-          <View style={styles.modalView}>
-            <TextInput
-              placeholder="Enter name"
-              value={name}
-              style={styles.textInput}
-              onChangeText={(value) => setName(value)}
-            />
-            <TextInput
-              placeholder="M/F"
-              value={gender}
-              style={styles.textInput}
-              onChangeText={(value) => setGender(value)}
-            />
-            <TextInput
-              placeholder="KG"
-              value={weight.toString()}
-              style={styles.textInput}
-              onChangeText={(value) => setWeight(value)}
-            />
-            <TextInput
-              placeholder="cm"
-              value={height.toString()}
-              style={styles.textInput}
-              onChangeText={(value) => setHeight(value)}
-            />
-            <Button title="Confirm" onPress={toggleModalVisibility} />
-          </View>
-        </View>
+        
+        <ProfileInput addProfile={addProfile}/>
       </Modal>
+      
     </View>
   );
 }
@@ -157,7 +140,7 @@ const styles = StyleSheet.create({
   text: {
     color: "#000",
     fontSize: 20,
-    textAlign:"center",
+    textAlign: "center",
   },
   viewWrapper: {
     flex: 1,
@@ -172,8 +155,6 @@ const styles = StyleSheet.create({
     top: "20%",
     left: "10%",
     elevation: 5,
-    // transform: [{ translateX: -(width * 0.4) },
-    //             { translateY: -90 }],
     height: 380,
     width: "80%",
     backgroundColor: "#fff",
